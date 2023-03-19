@@ -1,0 +1,129 @@
+\chapter{Практические задания}
+
+\section*{Задание 1}
+
+Написать функцию, которая принимает целое число и возвращает первое четное число, не меньшее аргумента.
+
+\begin{lstinputlisting}[
+	caption={Задание 1},
+	label={lst:t1},
+	linerange={3-9},
+	]{../src/main.lsp}
+\end{lstinputlisting}
+
+\section*{Задание 2}
+
+Написать функцию, которая принимает число и возвращает число того же знака, но с модулем на 1 больше модуля аргумента.
+
+\begin{lstinputlisting}[
+	caption={Задание 2},
+	label={lst:t2},
+	linerange={30-35},
+	]{../src/main.lsp}
+\end{lstinputlisting}
+
+\section*{Задание 3}
+
+Написать функцию, которая принимает два числа и возвращает список из этих чисел, расположенный по возрастанию.
+
+\begin{lstinputlisting}[
+	caption={Задание 3},
+	label={lst:t3},
+	linerange={43-48},
+	]{../src/main.lsp}
+\end{lstinputlisting}
+
+\section*{Задание 4}
+
+Написать функцию, которая принимает три числа и возвращает Т только тогда, когда первое число расположено между вторым и третьим.
+
+\begin{lstinputlisting}[
+	caption={Задание 4},
+	label={lst:t4},
+	linerange={56-60},
+	]{../src/main.lsp}
+\end{lstinputlisting}
+
+\section*{Задание 5}
+Каков результат вычисления следующих выражений?
+
+\begin{table}[ht]
+	\begin{center}
+		\begin{tabular}{|c|c|}
+			\hline
+			\textbf{Выражение} & \textbf{Результат} \\
+			\hline
+			(and 'fee 'fie 'foe)  & foe \\
+			\hline
+			(or 'fee 'fie 'foe) & fee \\
+			\hline
+			(or nil 'fie 'foe)  & fie \\
+			\hline
+			(and nil 'fie 'foe) & nil \\
+			\hline
+			(and (equal 'abc 'abc) 'yes) & yes \\
+			\hline
+			(or (equal 'abc 'abc) 'yes) & T \\
+			\hline
+		\end{tabular}
+	\end{center}
+\end{table}
+
+\section*{Задание 6}
+
+Написать предикат, который принимает два числа-аргумента и возвращает Т, если первое число не меньше второго.
+
+\begin{lstinputlisting}[
+	caption={Задание 6},
+	label={lst:t6},
+	linerange={79-81},
+	]{../src/main.lsp}
+\end{lstinputlisting}
+
+\section*{Задание 7}
+
+Какой из следующих двух вариантов предиката ошибочен и почему?
+
+\begin{lstinputlisting}[
+	caption={Задание 7},
+	label={lst:t7},
+	linerange={93-99},
+	]{../src/main.lsp}
+\end{lstinputlisting}
+
+Ошибочный вариант будет $pred2$, т.к. сначала попытается вычислить положительное ли число путем использования $plusp$, что может вызвать ошибку, если x не является числом.
+
+\section*{Задание 8}
+
+Решить задачу 4, используя для ее решения конструкции: только IF, только COND, только AND/OR.
+
+\begin{lstinputlisting}[
+	caption={Задание 8},
+	label={lst:t8},
+	linerange={111-134},
+	]{../src/main.lsp}
+\end{lstinputlisting}
+
+\section*{Задание 9}
+
+Переписать функцию how-alike, приведенную в лекции и использующую COND, используя только конструкции IF, AND/OR.
+
+\begin{lstinputlisting}[
+	label={lst:t9-1},
+	linerange={153-159},
+	]{../src/main.lsp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Задание 9 (Начало)},
+	label={lst:t9-2},
+	linerange={161-180},
+	]{../src/main.lsp}
+\end{lstinputlisting}
+
+\begin{lstinputlisting}[
+	caption={Задание 9 (Продолжение)},
+	label={lst:t9-3},
+	linerange={181-188},
+	]{../src/main.lsp}
+\end{lstinputlisting}
