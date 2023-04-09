@@ -1,0 +1,100 @@
+domains
+name, surname = string.
+
+phone, city, street = string.
+house, flat = integer.
+address = address(city, street, house, flat).
+
+price = integer.
+colour, mark, car_number = string.
+
+bankname = string.
+account, sum = integer.
+
+area, floors = integer.
+property_name, region = string.
+
+property_item = 
+    car(property_name, colour, price, car_number);
+    building(property_name, price, area, floors);
+    plot(property_name, price, area, region);
+    water_vehicle(property_name, price, mark, colour).		
+
+property_type = string.
+	
+predicates
+record(surname, name, address, phone).
+bank(surname, bankname, account, sum).
+property(surname, property_item).
+
+
+property_by_surname(surname, property_name).
+property_and_price_by_surname(surname, property_name, price).
+
+propety_price(surname, property_type, price).
+all_sum_property_by_surname(surname, price).
+
+clauses
+record("Иванов", "Александр", address("Москва", "Абельмановская улица", 10, 20), "+89280202902").
+record("Иванов", "Виктор", address("Новосибирск", "Авиаматорная улица", 1, 10), "8456372").
+record("Сидоров", "Александр", address("Москва", "Анненский проезд", 3, 15), "8994527").
+record("Жаров", "Андрей", address("Москва", "улица Носова", 1, 16), "8994558").
+record("Петров", "Евгений", address("Москва", "улица Петра", 5, 10), "6994566").
+
+bank("Иванов", "Sberbank", 34224212, 200000).
+bank("Петров", "Tinkoff", 12232323, 300000).
+bank("Сидоров", "VTB", 23232332, 150000).
+
+property("Иванов", car("Mercedes", "black", 150000, "aa111a")).
+property("Петров", car("Touyta", "white", 150000, "aa222a")).
+property("Сидоров", car("Lada", "white", 150000, "aa333a")).
+
+property("Иванов", building("school", 30000, 1, 1)).
+property("Жаров", building("home", 20000, 2, 4)).
+property("Петров", building("any", 40000, 4, 1)).
+
+property("Иванов", plot("field", 30000, 1, "Подмосковье")).
+property("Сидоров", plot("field-2", 10000, 5, "Рамеский округ")).
+property("Жаров", plot("field-3", 10000, 6, "Москва")).
+
+property("Иванов", water_vehicle("Водный мотоцикл", 10000, "Yamaha", "red")).
+property("Сидоров", water_vehicle("Яхта", 10000000, "Qoollo", "blue")).
+
+property_by_surname(Surname, PropertyName):-
+    property(Surname, car(PropertyName, _, _, _));
+    property(Surname, building(PropertyName, _, _, _));
+    property(Surname, plot(PropertyName, _, _, _));
+    property(Surname, water_vehicle(PropertyName, _, _, _)).
+
+property_and_price_by_surname(Surname, PropertyName, Price):-
+    property(Surname, car(PropertyName, _, Price, _));
+    property(Surname, building(PropertyName, Price, _, _));
+    property(Surname, plot(PropertyName, Price, _, _));
+    property(Surname, water_vehicle(PropertyName, Price, _, _)).
+
+propety_price(Surname, car, Price) :-
+    property(Surname, car(_, _, Price, _)), !.
+propety_price(Surname, building, Price) :-
+    property(Surname, building(_, Price, _, _)), !.
+propety_price(Surname, plot, Price) :-
+    property(Surname, plot(_, Price, _, _)), !.
+propety_price(Surname, water_vehicle, Price) :-
+    property(Surname, water_vehicle(_, Price, _, _)), !.        
+propety_price(_, _, 0).
+
+all_sum_property_by_surname(Surname, Price) :-
+    propety_price(Surname, car, CarPrice),
+    propety_price(Surname, building, BuildingPrice),
+    propety_price(Surname, plot, PlotPrice),
+    propety_price(Surname, water_vehicle, WVPrice),
+    Price = CarPrice + BuildingPrice + PlotPrice + WVPrice.
+
+goal
+% Название всех объектов заданного субъекта
+% property_by_surname("Иванов", PropertyName).
+
+% Название и стоимость всех объектоа собственности заданного субъекта
+% property_and_price_by_surname("Иванов", PropertyName, Price).
+
+% Найти суммарную стоимость всех объектов собственника
+all_sum_property_by_surname("Петров", Price).
