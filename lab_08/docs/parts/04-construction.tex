@@ -1,67 +1,139 @@
 \chapter{Практическая часть}
 
-\section*{Программа <<Телефонный справочник>>}
+\section*{Программа <<Собственники>>}
 
-Разработать свою программу --- <<Телефонный справочник>>. 
-Владельцы могут иметь несколько телефонов и автомобилей (Факты).
-Протестировать работу программы, используя разные вопросы. 
+Создать базу знаний <<Собственники>>, дополнив (и минимально изменив) базу
+знаний, хранящую знания  в лабораторной №7:
 \begin{itemize}
-	\item <<Телефонный справочник>>: Фамилия, №тел, Адрес – структура (Город, Улица, №дома, №кв);
-	\item <<Автомобиль>>: Фамилия, Марка, Цвет, Стоимость, Номер.
+	\item «Телефонный справочник»: Фамилия, №тел, Адрес – структура (Город,
+	Улица, №дома, №кв),
+	\item «Автомобили»: Фамилия владельца, Марка, Цвет, Стоимость, и др.,
+	\item «Вкладчики банков»: Фамилия, Банк, счет, сумма, др.,
+	знаниями о дополнительной собственности владельца. Преобразовать знания об
+	автомобиле к форме знаний о собственности.
 \end{itemize}
 
-\begin{lstlisting}[caption=Программа <<Телефонный справочник>> (Начало)]
+Вид собственности (кроме автомобиля):
+\begin{itemize}
+	\item Строение, стоимость и другие его характеристики;
+	\item Участок, стоимость и другие его характеристики;
+	\item Водный транспорт, стоимость и другие его характеристики.
+\end{itemize}
+
+\begin{lstlisting}[caption=Программа <<Собственники>>]
 domains
-	name, surname=string.
-	phone_list=string*.
-	city, street=string.
-	house, flat=integer.
-	address=address_data(city, street, house, flat).
-	price, car_number=integer.
-	colour, brand=string.
+	name, surname = string.
+	
+	phone, city, street = string.
+	house, flat = integer.
+	address = address(city, street, house, flat).
+	
+	price = integer.
+	colour, mark, car_number = string.
+	
+	bankname = string.
+	account, sum = integer.
+\end{lstlisting}
+\begin{lstlisting}	
+	area, floors = integer.
+	property_name, region = string.
+	
+	property_item = 
+		car(property_name, colour, price, car_number);
+		building(property_name, price, area, floors);
+		plot(property_name, price, area, region);
+		water_vehicle(property_name, price, mark, colour).		
+	
+	property_type = string.
 
 predicates
-	phone_record(surname, name, address, phone_list).
-	car(surname, name, brand, colour, price, car_number).
-	question(surname, city, phone_list, brand, colour).
+	record(surname, name, address, phone).
+	bank(surname, bankname, account, sum).
+	property(surname, property_item).
 	
+	
+	property_by_surname(surname, property_name).
+	property_and_price_by_surname(surname, property_name, price).
+	
+	propety_price(surname, property_type, price).
+	all_sum_property_by_surname(surname, price).
+
 clauses
-	car("Иванов", "Александр", "Mercedes", "black", 200000, 2313).
-	car("Иванов", "Виктор", "Mercedes", "yellow", 200000, 4312).
-	car("Сидоров", "Александр", "Lada", "red", 50000, 5555).
-	car("Жаров", "Андрей", "Toyta", "green", 100000, 9999).
-	car("Петров", "Евгений", "Audi", "gray", 600000, 8888).
-	car("Петров", "Евгений", "Mercedes", "black", 500000, 7788).
-\end{lstlisting}
+	record("Иванов", "Александр", address("Москва", "Абельмановская улица", 10, 20), "+89280202902").
+	record("Иванов", "Виктор", address("Новосибирск", "Авиаматорная улица", 1, 10), "8456372").
+	record("Сидоров", "Александр", address("Москва", "Анненский проезд", 3, 15), "8994527").
+	record("Жаров", "Андрей", address("Москва", "улица Носова", 1, 16), "8994558").
+	record("Петров", "Евгений", address("Москва", "улица Петра", 5, 10), "6994566").
+	
+	bank("Иванов", "Sberbank", 34224212, 200000).
+	bank("Петров", "Tinkoff", 12232323, 300000).
+	bank("Сидоров", "VTB", 23232332, 150000).
 
+\end{lstlisting}
 \clearpage
+\begin{lstlisting}	
+	property("Иванов", car("Mercedes", "black", 150000, "aa111a")).
 	
-\begin{lstlisting}[caption=Программа <<Телефонный справочник>> (Продолжение)]
-	phone_record("Иванов", "Александр", address_data("Москва", "Абельмановская улица", 10, 20), ["+89280202902", "+891904802", "+891904805"]).
-	phone_record("Иванов", "Виктор", address_data("Новосибирск", "Авиаматорная улица", 1, 10), ["8456372"]).
-	phone_record("Сидоров", "Александр", address_data("Москва", "Анненский проезд", 3, 15), ["8994527"]).
-	phone_record("Жаров", "Андрей", address_data("Москва", "улица Носова", 1, 16), ["8994558"]).
-	phone_record("Петров", "Евгений", address_data("Москва", "улица Петра", 5, 10), ["6994566"]).
+	property("Петров", car("Touyta", "white", 150000, "aa222a")).
+	property("Сидоров", car("Lada", "white", 150000, "aa333a")).
 	
-	question(Surname, City, Phone, Brand, Colour) :-
-	phone_record(Surname, _, address_data(City, _, _, _), Phone),
-	car(Surname, _, Brand, Colour, _, _).
+	property("Иванов", building("school", 30000, 1, 1)).
+	property("Жаров", building("home", 20000, 2, 4)).
+	property("Петров", building("any", 40000, 4, 1)).
+	
+	property("Иванов", plot("field", 30000, 1, "Подмосковье")).
+	property("Сидоров", plot("field-2", 10000, 5, "Рамеский округ")).
+	property("Жаров", plot("field-3", 10000, 6, "Москва")).
+	
+	property("Иванов", water_vehicle("Водный мотоцикл", 10000, "Yamaha", "red")).
+	property("Сидоров", water_vehicle("Яхта", 10000000, "Qoollo", "blue")).
+	
+	property_by_surname(Surname, PropertyName):-
+	property(Surname, car(PropertyName, _, _, _));
+	property(Surname, building(PropertyName, _, _, _));
+	property(Surname, plot(PropertyName, _, _, _));
+	property(Surname, water_vehicle(PropertyName, _, _, _)).
+	
+	property_and_price_by_surname(Surname, PropertyName, Price):-
+	property(Surname, car(PropertyName, _, Price, _));
+	property(Surname, building(PropertyName, Price, _, _));
+	property(Surname, plot(PropertyName, Price, _, _));
+	property(Surname, water_vehicle(PropertyName, Price, _, _)).
+	
+	propety_price(Surname, car, Price) :-
+	property(Surname, car(_, _, Price, _)), !.
+	propety_price(Surname, building, Price) :-
+	property(Surname, building(_, Price, _, _)), !.
+	propety_price(Surname, plot, Price) :-
+	property(Surname, plot(_, Price, _, _)), !.
+	propety_price(Surname, water_vehicle, Price) :-
+	property(Surname, water_vehicle(_, Price, _, _)), !.        
 \end{lstlisting}
-
-Задать вопрос такой чтобы по Марке и Цвету автомобиля найти Фамилию, Город, Телефон.
-\begin{lstlisting}[caption=Программа <<Телефонный справочник>> (Вопрос)]
-goal
-	% Какую фамилию, номер, город, имеет владелец автомобиля конкретной марки и цвета автомобиля?
-	question(Surname, City, Phone, "Mercedes", "black").
-\end{lstlisting}
-
-Другие вопросы:
+\clearpage
 \begin{lstlisting}
-	question("Иванов", "Новосибирск", ["8456372"], Brand, Colour).
+	propety_price(_, _, 0).
 	
-	phone_record(Surname, _, address_data("Москва", _, _, _), _), car(Surname, _, Mark, _, _, CarNumber).
-	
-	car("Жаров", _, "Toyta", _, _, _).
-	
-	car(Surname, Name,  "Mercedes", _, _, _).
+	all_sum_property_by_surname(Surname, Price) :-
+	propety_price(Surname, car, CarPrice),
+	propety_price(Surname, building, BuildingPrice),
+	propety_price(Surname, plot, PlotPrice),
+	propety_price(Surname, water_vehicle, WVPrice),
+	Price = CarPrice + BuildingPrice + PlotPrice + WVPrice.
+
+goal
+% Название всех объектов заданного субъекта
+property_by_surname("Иванов", PropertyName).
+
+% Название и стоимость всех объектоа собственности заданного субъекта
+property_and_price_by_surname("Иванов", PropertyName, Price).
+
+% Найти суммарную стоимость всех объектов собственника
+all_sum_property_by_surname("Петров", Price).
+\end{lstlisting}
+
+\subsection*{Поясняющая таблица}
+
+Название и стоимость всех объекта собственности заданного субъекта.
+\begin{lstlisting}
+property_and_price_by_surname("Иванов", PropertyName, Price).
 \end{lstlisting}
