@@ -1,0 +1,269 @@
+\chapter {Дополнение}
+
+\subsection*{Составить ER-диаграмму (нотацию Чена) для лабораторной работы.}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{img/er.png}
+	\label{fig:er}
+\end{figure}
+
+\subsection*{Древо семье}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=1\textwidth]{img/tree.png}
+	\label{fig:tree}
+\end{figure}
+
+В программе более 5 видов родственников для человека:
+\begin{enumerate}
+	\item родители;
+	\item братья и сестра;
+	\item бабушки и дедушки;
+	\item тети и дяди;
+	\item кузены.
+	\item сестры и братья жены/мужа.
+\end{enumerate}
+
+\subsection*{Заполнение базы знаний}
+\noindent\begin{minipage}[T]{.45\textwidth}
+	\begin{lstlisting}[caption=Prolog]
+isGender("CA", "male").
+isGender("MA", "female").
+isGender("FA", "male").
+isGender("MMA", "female").
+isGender("FMA", "male").
+isGender("MFA", "female").
+isGender("FFA", "male").
+isGender("MMMA", "female").
+isGender("FMMA", "male").
+isGender("MFMA", "female").
+isGender("FFMA", "male").
+isGender("MMFA", "female").
+isGender("FMFA", "male").
+isGender("MFFA", "female").
+isGender("FFFA", "male").
+isGender("Brother of Mother 1", "male").
+isGender("Brother of Mother 2", "male").
+isGender("Sister of Mother 1", "female").
+isGender("Sister of Father 1", "female").
+isGender("Sister1", "female").
+isGender("Brother1", "male").
+isGender("Brother2", "male").
+isGender("Cousin1", "male").
+isGender("Cousin2", "female").
+isGender("Cousin3", "female").
+isGender("Cousin4", "male").
+isGender("CB", "male").
+isGender("MB", "female").
+isGender("FB", "male").			
+	\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}[T]{.5\textwidth}
+	\begin{lstlisting}[caption=Neo4j]
+CREATE   
+(CA:Human {name: "CA", gender: "male"}),
+(MA:Human {name: "MA", gender: "female"}),
+(FA:Human {name: "FA", gender: "male"}),
+(MMA:Human {name: "MMA", gender: "female"}),
+(FMA:Human {name: "FMA", gender: "male"}),
+(MFA:Human {name: "MFA", gender: "female"}),
+(FFA:Human {name: "FFA", gender: "male"}),
+(MMMA:Human {name: "MMMA", gender: "female"}),
+(FMMA:Human {name: "FMMA", gender: "male"}),
+(MFMA:Human {name: "MFMA", gender: "female"}),
+(FFMA:Human {name: "FFMA", gender: "male"}),
+(MMFA:Human {name: "MMFA", gender: "female"}),
+(FMFA:Human {name: "FMFA", gender: "male"}),
+(MFFA:Human {name: "MFFA", gender: "female"}),
+(FFFA:Human {name: "FFFA", gender: "male"}),
+(Uncle1:Human {name: "Brother of Mother 1", gender: "male"}),
+(Uncle2:Human {name: "Brother of Mother 2", gender: "male"}),
+(Aunt1:Human {name: "Sister of Mother 1", gender: "female"}),
+	\end{lstlisting}
+\end{minipage}
+
+\noindent\begin{minipage}[T]{.45\textwidth}
+	\begin{lstlisting}[caption=Prolog (Продолжение)]
+getParent("CA", "MA").
+getParent("CA", "FA").		
+getParent("FA", "MFA").
+getParent("FA", "FFA").
+getParent("MA", "MMA").
+getParent("MA", "FMA").
+getParent("MMA", "MMMA").
+getParent("MMA", "FMMA").
+getParent("FMA", "MFMA").
+getParent("FMA", "FFMA").
+getParent("MFA", "MMFA").
+getParent("MFA", "FMFA").	
+getParent("FFA", "FFFA").
+getParent("FFA", "MFFA").
+getParent("Brother of Mother 1", "MMA").
+getParent("Brother of Mother 1", "FMA").
+getParent("Sister of Mother 1", "MMA").
+getParent("Sister of Mother 1", "FMA").
+getParent("Sister of Father 1", "MFA").
+getParent("Sister of Father 1", "FFA").
+getParent("Sister1", "MA").
+getParent("Brother1", "FA").
+getParent("Brother1", "MA").
+getParent("Brother2", "MA").
+getParent("Brother2", "FA").
+getParent("Sister2", "FA").
+getParent("Cousin1", "Brother of Mother 1").
+getParent("Cousin2", "Sister of Mother 1").
+getParent("Cousin3", "Sister of Father 1").			
+	\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}[T]{.5\textwidth}
+	\begin{lstlisting}[caption=Neo4j (Продолжение)]
+(Sister1:Human {name: "Sister1", gender: "female"}),
+(Sister2:Human {name: "Sister2", gender: "female"}),
+(Brother1:Human {name: "Brother1", gender: "male"}),
+(Brother2:Human {name: "Brother2", gender: "male"}),
+(Cousin1:Human {name: "Cousin1", gender: "female"}),
+(Cousin2:Human {name: "Cousin2", gender: "male"}),
+(Cousin3:Human {name: "Cousin3", gender: "male"}),
+(FA)-[:IS_PARENT]->(CA),
+(MA)-[:IS_PARENT]->(CA),
+(FA)-[:IS_PARENT]->(Brother1),
+(MA)-[:IS_PARENT]->(Brother1),
+(FA)-[:IS_PARENT]->(Brother2),
+(MA)-[:IS_PARENT]->(Brother2),
+(FA)-[:IS_PARENT]->(Sister2),
+(MA)-[:IS_PARENT]->(Sister1),
+(FA)-[:ARE_ENGAGED]->(MA),
+(MA)-[:ARE_ENGAGED]->(FA),
+(FFA)-[:IS_PARENT]->(FA),
+(MFA)-[:IS_PARENT]->(FA),
+(FFA)-[:ARE_ENGAGED]->(MFA),
+(MFA)-[:ARE_ENGAGED]->(FFA),
+(FFA)-[:IS_PARENT]->(Aunt1),
+(MFA)-[:IS_PARENT]->(Aunt1),
+(Aunt1)-[:IS_PARENT]->(Cousin3),
+(Uncle2)-[:IS_PARENT]->(Cousin2),
+(Uncle1)-[:IS_PARENT]->(Cousin1),
+(MMA)-[:IS_PARENT]->(Uncle2),
+(FMA)-[:IS_PARENT]->(Uncle2),
+(MMA)-[:IS_PARENT]->(Uncle1),
+(FMA)-[:IS_PARENT]->(Uncle1),
+(FFFA)-[:IS_PARENT]->(FFA),
+(MFFA)-[:IS_PARENT]->(FFA),
+(FMFA)-[:IS_PARENT]->(MFA),	
+	\end{lstlisting}
+\end{minipage}
+
+\noindent\begin{minipage}[T]{.45\textwidth}
+\begin{lstlisting}[caption=Prolog (Продолжение)]
+getParent("CB", "MB").	
+getParent("CB", "FB").
+isMarried("FA", "MA").
+isMarried("FB", "MB").	
+isMarried("FMA", "MMA").
+isMarried("FFA", "MFA").			
+\end{lstlisting}
+\end{minipage}\hfill
+\begin{minipage}[T]{.5\textwidth}
+	\begin{lstlisting}[caption=Neo4j (Продолжение)]
+(MMFA)-[:IS_PARENT]->(MFA),
+(FMA)-[:IS_PARENT]->(MA),
+(MMA)-[:IS_PARENT]->(MA),
+(FMA)-[:ARE_ENGAGED]->(MMA),
+(MMA)-[:ARE_ENGAGED]->(FMA),
+(FFMA)-[:IS_PARENT]->(FMA),
+(MFMA)-[:IS_PARENT]->(FMA),
+(FMMA)-[:IS_PARENT]->(MMA),
+(MMMA)-[:IS_PARENT]->(MMA)	
+	\end{lstlisting}
+\end{minipage}
+
+\subsection*{Привести вопрос и ответ на РЕЯ, Prolog и SQL.}
+
+РЕЯ: 1. Вывести имя мамы человека по имени.
+
+\begin{lstlisting}[caption=Prolog: Вывести имя мамы человека по имени]
+PREDICATE
+	isGender(name, gender).
+	getParent(name, name).
+	getMother(name, name).
+CLAUSES
+	...
+	getMother(Child, Mother) :-
+		getParent(Child, Mother),
+		isGender(Mother, "female").
+GOAL
+	getMother("CA", Mother).	
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Neo4j: Вывести имя мамы человека по имени]
+match (parent:Human) 
+match (child:Human) 
+match (parent)-[r1:IS_PARENT]->(child) 
+where child.name = "CA" and parent.gender = "female"    
+return parent.name
+\end{lstlisting}
+
+\clearpage
+
+РЕЯ: 2. Вывести имена предков родителей по отцовской линии
+
+\begin{lstlisting}[caption=Prolog:  Вывести имена предков родителей по отцовской линии]
+PREDICATE
+	isGender(name, gender).
+	getParent(name, name).
+	getGrandParentByFather(name, name, gender)
+CLAUSES
+	...
+	getGrandParentByFather(Child, GrandParent, GrandParentGender) :- 
+		getParent(Child, Parent),
+		isGender(Parent, "male"),
+		getParent(Parent, GrandParent),
+		isGender(GrandParent, GrandParentGender).
+GOAL
+	getGrandParentByFather("CA", GrandParent, _).	
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Neo4j: Вывести имена предков родителей по отцовской линии]
+match(grandparent:Human) 
+match(parent:Human) 
+match(child:Human)
+match(grandparent)-[r2:IS_PARENT]->(parent)-[r1:IS_PARENT]->(child)
+where child.name = "CA" and parent.gender = "male"
+return grandparent.name
+\end{lstlisting}
+
+\clearpage
+
+РЕЯ: 3. Вывести имена всех братьев и сестер по жене - по имени мужу
+
+\begin{lstlisting}[caption=Prolog: Вывести имена всех братьев и сестер по жене ]
+PREDICATE
+	isGender(name, gender).
+	getParent(name, name).
+	getSibling(name, name, gender).
+	getSiblingWife(name, name, gender).
+CLAUSES
+	...
+	getSibling(Child, Sibling, Gender) :- 
+		getParent(Child, Parent),
+		getParent(Sibling, Parent),
+		isGender(Sibling, Gender),
+		not(Child = Sibling).
+	getSiblingWife(Husband, Sibling, Gender) :-
+		isMarried(Husband, Wife),
+		getSibling(Wife, Sibling, Gender).
+GOAL
+	getSiblingWife("FA", Sibling, _).	
+\end{lstlisting}
+
+\begin{lstlisting}[caption=Neo4j: Вывести имена всех братьев и сестер по жене ]
+match(husband:Human) 
+match(wife:Human)
+match(sibling:Human)
+match(wifeParent:Human)
+match(husband)-[r:ARE_ENGAGED]->(wife)<-[r1:IS_PARENT]- (wifeParent)-[r2:IS_PARENT]->(sibling)
+where husband.name = "FA"
+return sibling.name, sibling.gender
+\end{lstlisting}

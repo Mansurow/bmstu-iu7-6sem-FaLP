@@ -1,3 +1,36 @@
+\chapter{Практическая часть}
+
+\section*{Программа <<Предки>>}
+1. Создать базу знаний «Предки», позволяющую наиболее эффективным способом
+(за меньшее количество шагов, что обеспечивается меньшим количеством
+предложений БЗ - правил), и используя разные варианты (примеры) простого вопроса,
+(указать: какой вопрос для какого варианта) определить:
+\begin{enumerate}
+	\item по имени субъекта определить всех его бабушек (предки 2-го колена),
+	\item по имени субъекта определить всех его дедушек (предки 2-го колена),
+	\item по имени субъекта определить всех его бабушек и дедушек (предки 2-го
+	колена),
+	\item по имени субъекта определить его бабушку по материнской линии (предки 2-го
+	колена),
+	\item по имени субъекта определить его бабушку и дедушку по материнской линии
+	(предки 2-го колена).
+\end{enumerate}
+Минимизировать количество правил и количество вариантов вопросов. Использовать
+конъюнктивные правила и простой вопрос. Для одного из вариантов ВОПРОСА задания 1
+составить таблицу, отражающую конкретный порядок работы системы.
+
+2. Дополнить базу знаний правилами, позволяющими найти:
+\begin{itemize}
+	\item Максимум из двух чисел: без использования отсечения и с использованием отсечения;
+	\item Максимум из трех чисел: без использования отсечения и с использованием отсечения.
+\end{itemize}
+
+Убедиться в правильности результатов.
+Для одного из вариантов ВОПРОСА и каждого варианта задания 1 и 2 составить таблицу, отражающую конкретный порядок работы системы.
+
+\clearpage
+
+\begin{lstlisting}[caption=Программа <<Предки>>]
 DOMAINS
 	name = string.
 	gender = string.
@@ -48,10 +81,11 @@ CLAUSES
 	isGender("FMFA", "male").
 	isGender("MFFA", "female").
 	isGender("FFFA", "male").
-
+	
 	isGender("Brother of Mother 1", "male").
 	isGender("Brother of Mother 2", "male").
 	isGender("Sister of Mother 1", "female").
+	isGender("Sister of Father 1", "female").
 	
 	isGender("Sister1", "female").
 	isGender("Brother1", "male").
@@ -60,6 +94,7 @@ CLAUSES
 	isGender("Cousin1", "male").
 	isGender("Cousin2", "female").
 	isGender("Cousin3", "female").
+	isGender("Cousin4", "male").
 	
 	isGender("CB", "male").
 	isGender("MB", "female").
@@ -77,7 +112,7 @@ CLAUSES
 	getParent("FMA", "MFMA").
 	getParent("FMA", "FFMA").
 	getParent("MFA", "MMFA").
-	getParent("MFA", "FMFA").
+	getParent("MFA", "FMFA").	
 	getParent("FFA", "FFFA").
 	getParent("FFA", "MFFA").
 	% сестра и братья родителей
@@ -106,11 +141,11 @@ CLAUSES
 	isMarried("FB", "MB").
 	isMarried("FMA", "MMA").
 	isMarried("FFA", "MFA").	
-		
+	
 	getMother(Child, Mother) :-
 		getParent(Child, Mother),
 		isGender(Mother, "female").
-		
+	
 	getFather(Child, Father) :- 
 		getParent(Child, Father),
 		isGender(Father, "male").	
@@ -129,7 +164,7 @@ CLAUSES
 		getParent(Child, Parent),
 		getParent(Parent, GrandParent),
 		isGender(GrandParent, GrandParentGender).
-		
+	
 	getGrandParentByMother(Child, GrandParent, GrandParentGender) :- 
 		getMother(Child, Parent),
 		isGender(Parent, "female"),
@@ -147,11 +182,11 @@ CLAUSES
 		getParent(Sibling, Parent),
 		isGender(Sibling, Gender),
 		not(Child = Sibling).
-		
+	
 	getUA(Child, UA, Gender) :-
 		getParent(Child, Parent),
 		getSibling(Parent, UA, Gender).
-		
+	
 	getCousin(Child, Cousin, Gender) :- 
 		getUA(Child, UA, _),
 		getParent(Cousin, UA),
@@ -164,16 +199,16 @@ CLAUSES
 	getSiblingHusband(Wife, Sibling, Gender) :-
 		isMarried(Husband, Wife),
 		getSibling(Husband, Sibling, Gender).
-		
+	
 	getParentN(Child, Parent, 1, Gender) :-
 		getParent(Child, Parent),
 		isGender(Parent, Gender).
-			
+	
 	getParentN(Child, ParentN, N, Gender) :-
 		New = N - 1,
 		getParent(Child, Parent),
 		getParentN(Parent, ParentN, New, Gender).
-		
+	
 	getGrandParentN(Child, GrandParentN, N, Gender) :-
 		getParent(Child, Parent),
 		getParentN(Parent, GrandParentN, N, Gender).										 	
@@ -216,6 +251,50 @@ GOAL
 	getSiblingWife("FA", Sibling, _).
 	% Сестры и братья по мужу - MA
 	getSiblingHusband("MA", Sibling, _).
-
+	
 	% вывести всех предков n-го порядка
 	getGrandParentN("CA", GrandParent, 2, Gender).	
+\end{lstlisting}
+
+\clearpage
+
+\begin{lstlisting}[caption=Дополнение к проограмме <<Предки>>]
+DOMAINS
+	number = integer.
+
+PREDICATES
+	max2(number, number, number).
+	max2_cut(number, number, number).
+	max3(number, number, number, number).
+	max3_cut(number, number, number, number).
+
+CLAUSES
+	max2(N1, N2, N2) :- N2 >= N1.
+	max2(N1, N2, N1) :- N1 >= N2.
+	
+	max2_cut(N1, N2, N2) :- N2 >= N1, !.
+	max2_cut(N1, _, N1).
+	
+	max3(N1, N2, N3, N3) :- N3 >= N1, N3 >= N2.
+	max3(N1, N2, N3, N2) :- N2 >= N1, N2 >= N3.
+	max3(N1, N2, N3, N1) :- N1 >= N2, N1 >= N3.
+	
+	max3_cut(N1, N2, N3, N3) :- N3 >= N2, N3 >= N1, !.
+	max3_cut(N1, N2, _, N2) :- N2 >= N1, !.
+	max3_cut(N1, _, _, N1).	
+
+GOAL
+	max2(-10, 20, RES).
+	max2_cut(-10, 20, RES).
+	
+	max2(20, -20, RES).
+	max2_cut(20, -20, RES). 
+	
+	max3(1, 2, 3, RES).
+	max3(3, 2 ,1, RES).
+	max3(1, 3, 2, RES).
+	
+	max3_cut(1, 2, 3, RES).
+	max3_cut(3, 2 ,1, RES).
+	max3_cut(1, 3, 2, RES).
+\end{lstlisting}
