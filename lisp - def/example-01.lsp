@@ -11,22 +11,22 @@
         ((< n 0) (* (/ 1 x) (pow x (+ n 1))))
         (t (* x (pow x (- n 1))))))
 
-(defun f (x z) 
-    (*
-    (exp
-    (* 
-    (* 
-    (pow (- x (/ a 2)) 2)
-    (pow (- z (/ b 2)) 2)
-    )
-    beta
-    )
-    )
-    f0
-    )
-)
+; (defun f (x z) 
+;     (*
+;     (exp
+;     (* 
+;     (* 
+;     (pow (- x (/ a 2)) 2)
+;     (pow (- z (/ b 2)) 2)
+;     )
+;     beta
+;     )
+;     )
+;     f0
+;     )
+; )
 
-;(defun f (x z) 0)
+(defun f (x z) 0)
 
 (setq h 1)
 (setq n (floor (/ a h)))
@@ -80,8 +80,8 @@
 (setq tmp 0)
 (setq eps 0.0001)
 
-(loop while (> dMax eps)
-    do 
+; (loop while (> dMax eps)
+;     do 
 (setq dMax 0)
 (loop for i from 1 to (- n 2)
     do 
@@ -109,7 +109,7 @@
                 (setf (aref uMtr i j) tmp)
         )
 )
-)
+
 
 
 (dotimes (i n)

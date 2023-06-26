@@ -15,7 +15,7 @@
 
 ; верно
 (defun f (x z)
-    (* f0 (exp (* (- 0 beta)
+    (* f0 (exp (* beta
                   (- x x0)
                   (- x x0)
                   (- z z0)
@@ -82,14 +82,44 @@
 (print (create-list-h m hz 0))
 (print (create-uList n m 0))
 
-
-(defun task-dirihle ()
-    (let (dMax 100)
-        (if (> dMax eps)
-            
-        )
-    )
+(defun getListValue (lst i j)
+    (nth j (nth i lst))
 )
+
+(defun update-list (lst i j val)
+  (if (= i 0)
+      (cons (update-row (car lst) j val) (cdr lst))
+      (cons (car lst) (update-list (cdr lst) (- i 1) j val))))
+
+(defun update-row (row j val)
+  (if (= j 0)
+      (cons val (cdr row))
+      (cons (car row) (update-row (cdr row) (- j 1) val))))
+
+(defun process-u (u i j dmax)
+  (if (< i (- n 1))
+      (if (< j (- m 1))
+          (let* ((tmp (/ (+ 
+                          (getListValue u i (1+ j))
+                          (getListValue u i (1- j))
+                          (getListValue u (1+ i) j)
+                          (getListValue u (1- i) j))
+                        4.0))
+                 (dm (abs (- tmp (getListValue u i j))))
+                 (new-u (update-list u i j tmp))
+                 (new-dmax (if (< dmax dm) dm dmax)))
+            (process-u new-u i (+ j 1) new-dmax))
+          (process-u u (+ i 1) 1 dmax))
+      (cons u dmax)))
+
+(defun calculate-dmax (u dmax k)
+  (let* ((result (process-u u 1 1 dmax))
+         (new-u (car result))
+         (new-dmax (cdr result))
+         (new-k (+ k 1)))
+    (if (and (> new-k 1000) (> new-dmax eps))
+        new-u
+        (calculate-dmax new-u new-dmax new-k))))
 
 
 (defun print-list (lst)
@@ -116,3 +146,29 @@
 )
 
 ;(modelConstant)
+
+(let ((u '((300 300 300 300 300 300 300 300 300 300) 
+           (300 0 0 0 0 0 0 0 0 300)
+           (300 0 0 0 0 0 0 0 0 300) 
+           (300 0 0 0 0 0 0 0 0 300) 
+           (300 0 0 0 0 0 0 0 0 300)
+           (300 0 0 0 0 0 0 0 0 300) 
+           (300 0 0 0 0 0 0 0 0 300) 
+           (300 0 0 0 0 0 0 0 0 300)
+           (300 0 0 0 0 0 0 0 0 300) 
+           (300 300 300 300 300 300 300 300 300 300)
+           )
+       )
+     )
+    (print (calculate-dmax u 100 0))
+)
+
+; (let ( (u '((1 2 3)
+;             (4 25 6)
+;             (7 8 9)
+;            )
+;         )
+;      )
+;     (setf (nth 0 u) '(10 10 10))
+;     (print u)
+; )
