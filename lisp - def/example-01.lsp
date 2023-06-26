@@ -1,7 +1,7 @@
 (defun make-mtr-zero (n m) (make-array (list n m)))
 
 (setq beta 0.02)
-(setq f0 -50)
+(setq f0 300)
 
 (setq a 10)
 (setq b 10)
@@ -11,22 +11,22 @@
         ((< n 0) (* (/ 1 x) (pow x (+ n 1))))
         (t (* x (pow x (- n 1))))))
 
-; (defun f (x z) 
-;     (*
-;     (exp
-;     (* 
-;     (* 
-;     (pow (- x (/ a 2)) 2)
-;     (pow (- z (/ b 2)) 2)
-;     )
-;     beta
-;     )
-;     )
-;     f0
-;     )
-; )
+(defun f (x z) 
+    (*
+    (exp
+    (* 
+    (* 
+    (* (- x 5) (- x 5))
+    (* (- z 5) (- z 5))
+    )
+    (- 0 beta)
+    )
+    )
+    f0
+    )
+)
 
-(defun f (x z) 0)
+;(defun f (x z) 0)
 
 (setq h 1)
 (setq n (floor (/ a h)))
@@ -35,13 +35,7 @@
 (setq xVect (make-array n))
 (setq zVect (make-array m))
 
-(print xVect)
-(print zVect)
-
 (setq uMtr (make-mtr-zero n m))
-
-(print uMtr)
-(princ " ")
 
 (loop for i from 0 to (- n 1) do
     (setf (aref xVect i) (* i h))
@@ -50,8 +44,6 @@
     (setf (aref zVect i) (* i h))
 )
 
-(print xVect)
-(print zVect)
 
 ; Граничные условия задаю
 (dotimes (i n)
@@ -67,12 +59,8 @@
     (setf (aref uMtr (- m 1) i) 300)
 )
 
-(print uMtr)
-
 ; Заполнение матрицы 
 ; алгоритма Гаусса – Зейделя решения задачи Дирихле
-
-(print xVect)
 
 (setq dMax 100)
 (setq dm 100)
@@ -80,8 +68,8 @@
 (setq tmp 0)
 (setq eps 0.0001)
 
-; (loop while (> dMax eps)
-;     do 
+(loop while (> dMax eps)
+    do 
 (setq dMax 0)
 (loop for i from 1 to (- n 2)
     do 
@@ -89,7 +77,7 @@
             do 
                 (setq tmp
                     (* 0.25
-                    (- (+  (aref uMtr i (+ j 1)) 
+                    (+ (+  (aref uMtr i (+ j 1)) 
                         (aref uMtr i (- j 1)) 
                         (aref uMtr (+ i 1) j) 
                         (aref uMtr (- i 1) j)
@@ -109,9 +97,19 @@
                 (setf (aref uMtr i j) tmp)
         )
 )
+)
 
 
-
+(dotimes (i n) 
+        (write (aref xVect i))
+        (princ " ")
+    )
+(terpri)
+(dotimes (i n) 
+        (write (aref zVect i))
+        (princ " ")
+    )
+(terpri)
 (dotimes (i n)
     (dotimes (j m) 
         (write (aref uMtr i j))
