@@ -1,46 +1,63 @@
+;-------------------------- Константы --------------------------------
 (defvar beta 0.5)
-(defvar f0 30)
+(defvar f0 300)
 (defvar xmax 10.0)
 (defvar zmax 10.0)
-(defvar n 10)
-(defvar m 10)
+(defvar n 100)
+(defvar m 100)
 (defvar hx (/ xmax n))
 (defvar hz (/ zmax n))
-(defvar x0 5)
-(defvar z0 5)
+(defvar x0 (/ xmax 2))
+(defvar z0 (/ zmax 2))
 ;(defvar F0 0)
 (defvar T0 300) 
 (defvar tau 1)
 (defvar eps 0.001)
+;--------------------------------------------------------------------
+;------------------- арифметические действия ------------------------
+(defun my+ (x y)
+    (+ x y)
+)
 
+(defun my- (x y)
+    (- x y)
+)
+
+(defun my* (x y)
+    (* x y)
+)
+
+(defun my/ (x y)
+    (/ x y)
+)
+;--------------------------------------------------------------------
 ; верно
 ; (defun f (x z)
 ;     0
 ; ) 
 
-; крест
+; (defun f (x z)
+;     (* f0 (exp (* (- 0 beta)
+;                   (+ (* (- x x0)
+;                   (- x x0))
+;                   ( * (- z z0)
+;                   (- z z0))) 
+;                )
+;           )
+;     )
+; )
+
+
 (defun f (x z)
     (* f0 (exp (* (- 0 beta)
-                  (+ (* (- x x0)
-                  (- x x0))
-                  ( * (- z z0)
-                  (- z z0))) 
+                  (- x x0)
+                  (- x x0)
+                  (- z z0)
+                  (- z z0)
                )
           )
     )
 )
-
-; купол
-#| (defun f (x z)
-    (* f0 (exp (* (- 0 beta)
-                  (- x x0)
-                  (- x x0)
-                  (- z z0)
-                  (- z z0)
-               )
-          )
-    )
-) |#
 
 (defun create-list-h (size step i)
     (if (<= size 0)
@@ -49,26 +66,45 @@
     )
 )
 
+;----------------------------------------- Границы --------------------------
 (defun xRight ()
-    T0
+    (* T0 2)
 )
 
 (defun xLeft ()
-    T0
+    (/ T0 2)
 )
 
 (defun zRight ()
-    T0
+    (* T0 1.5)
 )
 
 (defun zLeft ()
-    T0
+    (/ T0 1.5)
+)
+;----------------------------------------------------------------------------
+
+(defun create-list (n)
+    (if (zerop n)
+        nil
+        (cons 0 (create-list (1- n)))
+    )
 )
 
-(defun create-list-zLimit (size)
+(defun create-dList (n m)
+    (if (zerop n)
+        nil
+        (cons (create-list m) (create-dList (1- n) m))
+    )
+)
+
+(defun create-list-zLimit (size fl)
     (if (zerop size)
         nil
-        (cons T0 (create-list-zLimit (1- size)))
+        (if (zerop fl)
+            (cons (zLeft) (create-list-zLimit (1- size) fl))
+            (cons (zRight) (create-list-zLimit (1- size) fl))
+        )
     )
 )
 
@@ -76,9 +112,9 @@
     (if (>= i size)
         nil
         (if (zerop i)
-            (cons T0 (create-list-xLimit size (1+ i)))
+            (cons (xLeft) (create-list-xLimit size (1+ i)))
             (if (= i (1- n))
-                (cons T0 (create-list-xLimit size (1+ i)))
+                (cons (xRight) (create-list-xLimit size (1+ i)))
                 (cons 0 (create-list-xLimit size (1+ i)))
             )
         )
@@ -89,15 +125,11 @@
     (if (>= i n)
         nil
         (if (or (zerop i) (= i (1- n)))
-            (cons (create-list-zLimit m) (create-uList n m (1+ i)))
+            (cons (create-list-zLimit m i) (create-uList n m (1+ i)))
             (cons (create-list-xLimit m 0) (create-uList n m (1+ i)))
         )
     )
 )
-
-;(print (create-list-h n hx 0))
-;(print (create-list-h m hz 0))
-;(print (create-uList n m 0))
 
 (defun getListValue (lst i j)
     (nth j (nth i lst))
@@ -145,7 +177,7 @@
         new-u
         (calculate-dmax new-u x z new-dmax new-k))))
 
-
+;-------------------------------Вывод результатов-----------------------------
 (defun print-list (lst)
   (when lst
     (format t "~a " (car lst))
@@ -161,26 +193,32 @@
     )
 )
 
+
 (defun print-result (x z y)
+    (princ n)
+    (princ " ")
+    (princ m)
+    (terpri)
     (print-list x)
     (terpri)
     (print-list z)
     (terpri)
-    (terpri)
     (print-double-list y)      
 )
-
+;----------------------------------------------------------------------------
 (defun modelConstant()
     (let ((u  (create-uList n m 0))
        (x (create-list-h n hx 0))
        (z (create-list-h m hz 0))
      )
+        ;(print-result x z u)
         (print-result x z (calculate-dmax u x z 100 0))
     )
 )
 
 (modelConstant)
 
+; Тесты
 ; (let ((u '((300 300 300 300 300 300 300 300 300 300) 
 ;            (300 0 0 0 0 0 0 0 0 300)
 ;            (300 0 0 0 0 0 0 0 0 300) 
