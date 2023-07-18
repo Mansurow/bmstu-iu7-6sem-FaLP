@@ -10,6 +10,7 @@ def main():
 
     with open("data.txt", "r") as dataf:
         n, m = tuple(map(int, dataf.readline().split()))
+        print(n, m)
         x = tuple(map(float, dataf.readline().replace(",", ".").split()))
         z = tuple(map(float, dataf.readline().replace(",", ".").split()))
         print(x)
@@ -18,7 +19,7 @@ def main():
         for i in range(n):
             #y.append(tuple(map(float, dataf.readline().replace(",", ".").split())))
             tmp = tuple(map(float, dataf.readline().replace(",", ".").split()))
-            ntmp = [round(x) for x in tmp]
+            ntmp = [round(x, 5) for x in tmp]
             print(ntmp)
             y.append(ntmp)
     y = tuple(y)

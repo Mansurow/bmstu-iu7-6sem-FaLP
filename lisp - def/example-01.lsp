@@ -77,7 +77,7 @@
             do 
                 (setq tmp
                     (* 0.25
-                    (+ (+  (aref uMtr i (+ j 1)) 
+                    (- (+  (aref uMtr i (+ j 1)) 
                         (aref uMtr i (- j 1)) 
                         (aref uMtr (+ i 1) j) 
                         (aref uMtr (- i 1) j)

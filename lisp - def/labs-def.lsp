@@ -1,3 +1,133 @@
+; ======================================================================================================
+(with-open-file (str "log.txt"
+                     :direction :output
+                     :if-exists :supersede
+                     :if-does-not-exist :create)
+    (format str "============== Start ==========================~%")
+)
+
+(defun fprint-next-layer (name A B C D xi eta y)
+    (with-open-file (str "log.txt"
+                     :direction :output
+                     :if-exists :append
+                     :if-does-not-exist :create)
+        (format str "------------------ NextLayer~S  -----------------------~%" name)
+        (format str "A: ")
+        (fprint-list str A)
+        (format str "~%")
+        (format str "C: ")
+        (fprint-list str C)
+        (format str "~%")
+        (format str "B: ")
+        (fprint-list str B)
+        (format str "~%")
+        (format str "D: ")
+        (fprint-list str D)
+        (format str "~%")
+        (format str "xi: ")
+        (fprint-list str xi)
+        (format str "~%")
+        (format str "eta: ")
+        (fprint-list str eta)
+        (format str "~%")
+        (format str "eta: ")
+        (fprint-list str y)
+        (format str "~%-----------------------------------------------------~%")
+    ) 
+)
+
+(defun fprint-next-time (midy newy)
+    (with-open-file (str "log.txt"
+                     :direction :output
+                     :if-exists :append
+                     :if-does-not-exist :create)
+        (format str "------------------ Next Time -----------------------")
+        (format str "~%midy (данные прогонка по Z)")
+        (fprint-dlist str newy)
+        (format str "~%newy (данные прогонка по X):~%")
+        (fprint-dlist str newy)
+        (format str "~%-----------------------------------------------------~%")
+    ) 
+)
+
+(defun print-list (lst)
+  (when lst
+    (princ (car lst))
+    (princ " ")
+    (print-list (cdr lst))
+   )
+)
+
+(defun print-double-list (dlst)
+    (when dlst
+        (print-list (car dlst))
+        (terpri)
+        (print-double-list (cdr dlst)) 
+    )
+)
+
+(defun fprint-list (str lst)
+    (if (null lst)
+        nil
+        (or 
+            (format str "~A " (car lst)) 
+            (fprint-list str (cdr lst))
+        )
+    )
+)
+
+(defun fprint-dlist (str dlst)
+    (if (null dlst)
+        nil
+        (or
+            (fprint-list str (car dlst))
+            (format str "~%")
+            (fprint-dlist str (cdr dlst))
+        )
+    )
+)
+
+(defun print-result (x z y n m itr)
+    (terpri)
+    (princ "Количество итераций: ")
+    (princ itr)
+    (terpri)
+    (princ "Размеры: ")
+    (princ n)
+    (princ " ")
+    (princ m)
+    (terpri)
+    (princ "Список значений по оси OX: ")
+    (print-list x)
+    (terpri)
+    (princ "Список значений по оси OZ: ")
+    (print-list z)
+    (terpri)
+    (princ "Список значений по оси OY: ")
+    (terpri)
+    (print-double-list y)
+)
+
+(defun fprint-result (filename x z y n m itr flag)
+    (if (= flag 0)
+        (print-result x z y n m itr)
+        (print "Finish")
+    )
+
+    (with-open-file (str filename
+                     :direction :output
+                     :if-exists :supersede
+                     :if-does-not-exist :create)
+        (format str "~A ~A~%" n m)
+        (fprint-list str x)
+        (format str "~%")
+        (fprint-list str z)
+        (format str "~%")
+        (fprint-dlist str y)
+    )    
+)
+;=======================================================================================================
+
 (defun my-sum (lst)
   (if (null lst)
       0
@@ -50,29 +180,31 @@
     )
 )
 
+(defun my+ (&rest args)
+    (reduce #'+ args)
+)
 
-; (defun my-plus-args (&rest arg)
-;     (if (null args)
-;         0
-;         ; (if (null (cdr args))
-;         ;     (car args)
-;         ;     (my-plus (car args) (cdr args))
-;         ; )
-;         1
-;     )
-; )
+(defun my- (&rest args)
+    (reduce #'- args)
+)
 
-; (print (my-plus 1 2.5))
-; (print (my-minus 1 -2))
-; ;(print (my-multiply -5 -6))
-; (print (apply '+ (cdr '(1 2 3))))
+(defun my* (&rest args)
+    (reduce #'* args)
+)
 
-; -------------------------------------------------------------------------------------------------
+(defun my/ (&rest args)
+    (reduce #'/ args)
+)
+;----------------------------------- Тестирование ------------------------------------------------
 
+;(print (my* 1 2 3 4))
+
+;=================================================================================================
+; Глобальные значения для продольно-попречной прогонки решая уравнения теплопровдности Э)
 (defvar beta 0.5)
 (defvar f0 30)
-(defvar xmax 200.0)
-(defvar zmax 200.0)
+(defvar xmax 50.0)
+(defvar zmax 50.0)
 (defvar n 100)
 (defvar m 100)
 (defvar hx (/ xmax n))
@@ -104,11 +236,11 @@
 ; )
 
 (defun f (x z)
-    (* f0 (exp (* (- 0 beta)
-                    (+ (* (- x x0)
-                    (- x x0))
-                    ( * (- z z0)
-                    (- z z0))) 
+    (my* f0 (exp (my* (my- 0 beta)
+                    (my+ (my* (my- x x0)
+                    (my- x x0))
+                    (my* (my- z z0)
+                    (my- z z0))) 
                 )
             )
     )
@@ -124,7 +256,7 @@
     )
 )
 
-; ----------------------------- Прогонка -------------------------------------------
+; ================================================================ Прогонка =========================================================
 
 ; --- Коэффициенты
 
@@ -227,6 +359,7 @@
     )
 )
 
+;--------------------------------- Тестирование вычисление коэффициентов ----------------------------------
 ; (print (make-list-An 7))
 ; (print (make-list-Bn 7))
 ; (print (make-list-Cn 7))
@@ -245,7 +378,7 @@
 ; (print (calc-Dn 300 300 300 2.8571 1.4285))
 ; (print (calc-Dn 300 300 300 4.8571 1.4285))
 
-; ---
+; ----------------------------------------------------------------------------------------------------------
 ; a - значение A-коэффицентa - a[i]
 ; b - значение B-коэффицентa - b[i]
 ; c - значение C-коэффицентa - c[i]
@@ -327,7 +460,7 @@
     (reverse (calc-y-list xi eta y 0 n))
 )
 
-; Тест 1
+; -------------------------------------------------- Тестирование прогонки ----------------------------------------------------------------
 ; (print (calc-xi-list '(150.0 150.0 150.0 150.0 150.0 150.0 0) '(302 302 302 302 302 302 0) '(150 150 150 150 150 150 0) 1 0 6))
 ; ; (1 0.9868421 0.9741925 0.9623335 0.9514749 0.94174516 0.93319434)
 ; (print (calc-eta-list '(150.0 150.0 150.0 150.0 150.0 150.0 0) 
@@ -385,7 +518,9 @@
 ;      (terpri)
 ; )    
 
-; ---------------- Next Layer (подготовка к прогонке) -----------------------------s
+; =============================== Next Layer (подготовка к прогонке) ========================================================
+
+; начальные коэффициенты прогонки
 (defun xiStartX ()
     0
 )
@@ -408,6 +543,7 @@
             (xi (calc-xi-list (cdr A) (cdr B) (cdr C) (xiStartX) 0 (1- n)))
             (eta (calc-eta-list (cdr A) (cdr B) (cdr C) (cdr D) xi (etaStartX) 0 (1- n)))
           )
+        (fprint-next-layer "X" A B C D xi eta (get-y-list (reverse xi) (reverse eta) (yEndZ (car (last eta)) (car (last xi))) n))
         ; (terpri)
         ; (print "New NextLayerX")
         ; (print A)
@@ -420,6 +556,7 @@
     )
 )
 
+; начальные коэффициенты прогонки
 (defun xiStartZ ()
     0
 )
@@ -442,6 +579,7 @@
             (xi (calc-xi-list (cdr A) (cdr B) (cdr C) (xiStartZ) 0 (1- m)))
             (eta (calc-eta-list (cdr A) (cdr B) (cdr C) (cdr D) xi (etaStartZ) 0 (1- m)))
           )
+        (fprint-next-layer "Z" A B C D xi eta (get-y-list (reverse xi) (reverse eta) (yEndZ (car (last eta)) (car (last xi))) n))  
         ; (terpri)
         ; (print "New NextLayerZ")
         ; (print A)
@@ -453,8 +591,8 @@
         (get-y-list (reverse xi) (reverse eta) (yEndZ (car (last eta)) (car (last xi))) m)
     )
 )
-
-; (print (NextLayerX '(300 300 300 300 300 300 300)
+; ------------------------------------ Тестирование Next Layer ----------------------------------------------------------------
+; (print (NextLayerX 0 '(300 300 300 300 300 300 300)
 ;                     '(300 300 300 300 300 300 300)
 ;                     '(300 300 300 300 300 300 300)
 ;                     '(0 1.4285 2.8571 4.2857 5.7143 7.1428 8.5714)
@@ -467,7 +605,7 @@
 ;                      '(0 1.4285 2.8571 4.2857 5.7143 7.1428 8.5714)
 ;                      ))
 
-;------------------------- Next Time - Нахождение промежуточного слоя -------------
+;------------------------- Next Time - Нахождение промежуточного слоя --------------------------------------------------------
 
 (defun Double2List (val n)
     (if (zerop n)
@@ -504,6 +642,7 @@
             )
             (newy (transp (append (cons (car temp-newy) nil) temp-newy (last temp-newy))))
         )
+        (fprint-next-time midy newy)
         ; (terpri)
         ; (print "New Next Time")
         ; (print midy)
@@ -566,6 +705,7 @@
     (reduce #'max (calc-materr newy y))
 )
 
+;------------------------------ Тестирование нахождение максимальной ошибки -------------------------------
 ; (print (cacl-maxerr '((302.4498 302.4498 300.54453 300.12103 300.0268 300.00568 300.00568)
 ;                       (302.4498 302.4498 300.54453 300.12103 300.0268 300.00568 300.00568)
 ;                       (302.44983 302.44983 300.54456 300.12103 300.02682 300.00568 300.00568)
@@ -607,86 +747,24 @@
 
 ;(print (create-2d-list 10 10))
 
-(defun print-list (lst)
-  (when lst
-    (princ (car lst))
-    (princ " ")
-    (print-list (cdr lst))
-   )
-)
-
-(defun print-double-list (dlst)
-    (when dlst
-        (print-list (car dlst))
-        (terpri)
-        (print-double-list (cdr dlst)) 
-    )
-)
-
-(defun fprint-list (str lst)
-    (if (null lst)
-        nil
-        (or 
-            (format str "~A " (car lst)) 
-            (fprint-list str (cdr lst))
-        )
-    )
-)
-
-
-
-(defun fprint-dlist (str dlst)
-    (if (null dlst)
-        nil
-        (or
-            (fprint-list str (car dlst))
-            (format str "~%")
-            (fprint-dlist str (cdr dlst))
-        )
-    )
-)
-(defun print-result (x z y n m itr)
-    (terpri)
-    (princ "Количество итераций = ")
-    (princ itr)
-    (terpri)
-    (princ n)
-    (princ " ")
-    (princ m)
-    (terpri)
-    (print-list x)
-    (terpri)
-    (print-list z)
-    (terpri)
-    (print-double-list y)
-
-
-    (with-open-file (str "data.txt"
-                     :direction :output
-                     :if-exists :supersede
-                     :if-does-not-exist :create)
-    (format str "~A ~A~%" n m)
-    (fprint-list str x)
-    (format str "~%")
-    (fprint-list str z)
-    (format str "~%")
-    (fprint-dlist str y)
-    )    
-)
-
-(defun main-itr (maxerr x z y itr)
-    (print itr)
+;---------------------------------- Запуск main функции ------------------------------------------------
+(defun main-itr (data maxerr x z y itr)
+    ;(print itr)
     (let (
             (newy (NextTime x z y))
         )
         (if (and (> maxerr 1e-5) T)
-            (main-itr (cacl-maxerr newy y) x z newy (1+ itr))
-            (print-result x z newy n m itr)    
+            (main-itr data (cacl-maxerr newy y) x z newy (1+ itr))
+            (fprint-result data x z newy n m itr 0)    
         )
     )
 )
 
-(main-itr 1 (create-list hx n 0)
-            (create-list hz m 0)
-            (create-2d-list n m) 0)
-; ---------------------------------------------------------------------------------
+(main-itr  "data.txt"               ; данные для graph.py
+            1                       ; maxerr init 
+            (create-list hx n 0)    ; список значений x
+            (create-list hz m 0)    ; список значений z
+            (create-2d-list n m)    ; двойной список (матрица) значений (T0) y
+            1                       ; счетчик количество итераций 
+)
+; ------------------------------------------------------------------------------------------------------
