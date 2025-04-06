@@ -203,8 +203,8 @@
 ; Глобальные значения для продольно-попречной прогонки решая уравнения теплопровдности Э)
 (defvar beta 0.5)
 (defvar f0 30)
-(defvar xmax 50.0)
-(defvar zmax 50.0)
+(defvar xmax 10.0)
+(defvar zmax 10.0)
 (defvar n 100)
 (defvar m 100)
 (defvar hx (/ xmax n))
@@ -354,7 +354,13 @@
 
 (defun make-list-D (n ynm_1 ynm ynm1 x z D)
     (nconc (cons 0
-                (map 'list (lambda (_ vynm_1 vynm vynm1 x z) (apply D (list vynm_1 vynm vynm1 x z))) (make-list (- n 2)) (cdr ynm_1) (cdr ynm) (cdr ynm1) x z) 
+                (map 'list (lambda (_ vynm_1 vynm vynm1 x z) (apply D (list vynm_1 vynm vynm1 x z))) 
+                            (make-list (- n 2)) 
+                            (cdr ynm_1) 
+                            (cdr ynm) 
+                            (cdr ynm1) 
+                            x 
+                            z) 
             ) '(0)
     )
 )
